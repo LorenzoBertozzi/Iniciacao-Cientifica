@@ -28,9 +28,8 @@ void counter(){
 }  
 
 void setup() {
-  //Inicia el Serial Port
   Serial.begin (9600);
-  //Define entradas y salidas
+  
   pinMode(trigPin, OUTPUT);
   pinMode(echoPin, INPUT);
   pinMode(encoder_pin, INPUT);
@@ -81,26 +80,24 @@ void loop() {
   duration = pulseIn(echoPin, HIGH);
   cm = (duration/2) / 29.1;
 
-  noInterrupts();                // Desconectamos la interrupción para que no actué en esta parte del programa.
-  rpm = 60 * pulses / pulsesperturn * 1000 / (millis() - timeold) ; // Calculamos las revoluciones por minuto
-  //Ojo con la fórmula de arriba, la variable rpm tiene que ser tipo float porque salen decimales en medio de la operación.
-  velocity = rpm/ratio * 3.1416 * wheel_diameter * 60 / 1000000; // Cálculo de la velocidad de la rueda en [Km/h]
-  Serial.print(millis()/1000); Serial.print("             "); // Se envia al puerto serie el valor de tiempo, de las rpm y los pulsos.
+  noInterrupts();               
+  rpm = 60 * pulses / pulsesperturn * 1000 / (millis() - timeold) ;
+  velocity = rpm/ratio * 3.1416 * wheel_diameter * 60 / 1000000; 
+  Serial.print(millis()/1000); Serial.print("             "); 
   Serial.print(pulses,0); Serial.print("          ");
   Serial.print(rpm,0); Serial.print("         ");
   Serial.print(rpm/ratio,1); Serial.print("           ");
   Serial.print(velocity,2);Serial.print("           ");
   Serial.println(cm);
-  pulses = 0;                    // Inicializamos los pulsos.
-  timeold = millis();            // Almacenamos el tiempo actual.
-  interrupts();                  // Reiniciamos la interrupción
+  pulses = 0;                   
+  timeold = millis();          
+  interrupts();                
   
   
   if (i < 256 && cm > 100){ 
     analogWrite(PINO_ENA, i);
     analogWrite(PINO_ENB, i);
-    delay(30); //intervalo para incrementar a variavel i
-    i=i+10;
+    i=i+5;
     
   }
   
