@@ -126,13 +126,14 @@ void loop() {
   timeoldB = millis();         
   interrupts();                
   
-  if (i < 256 && cm > 50){ 
+  if (cm > 50){ 
     analogWrite(PINO_ENA, i);
     analogWrite(PINO_ENB, i);
-    i=i+20;
-    
+    if(i < 256){
+      i=i+20;
+    }
   }
-  else{ 
+  if(cm < 50){ 
     i = 0;
     analogWrite(PINO_ENA, LOW);
     analogWrite(PINO_ENB, 100);
