@@ -16,7 +16,7 @@
 
 #define MAX_PWM 255 // Valor máximo de PWM para os motores
 #define WHEEL_DIAMETER 0.065 // Diâmetro da roda em metros (65 mm)
-#define WHEEL_BASE 0.15 // Distância entre os eixos das rodas em metros (ajuste conforme necessário)
+#define WHEEL_BASE 0.155 // Distância entre os eixos das rodas em metros (15,5 cm)
 
 // Definições dos pinos do sensor ultrassônico
 #define trigPin 10
@@ -54,26 +54,28 @@ void encoderB_ISR() {
 
 // Função para calcular RPM
 float RPM(int motor) {
-  unsigned long currentMillis = millis();
   float rpm = 0;
-
   if (motor == 1) {
+    unsigned long currentMillis = millis();
+    
     // Cálculo da RPM para o Motor A
     unsigned long elapsedMillisA = currentMillis - previousMillisA;
     previousMillisA = currentMillis;
 
     // Considera o encoder do canal 1 (encoderA1_count) para cálculo
-    rpm = (encoderA1_count / 11.0) * (600.0  / elapsedMillisA); // 8 pulsos por rotação (ajuste conforme necessário)
+    rpm = (encoderA1_count / 9.0) * (600.0  / elapsedMillisA); // 8 pulsos por rotação (ajuste conforme necessário)
     
     // Resetar a contagem para o próximo cálculo
     encoderA1_count = 0;
   } else if (motor == 2) {
+    unsigned long currentMillis = millis();
+    
     // Cálculo da RPM para o Motor B
     unsigned long elapsedMillisB = currentMillis - previousMillisB;
     previousMillisB = currentMillis;
 
     // Considera o encoder do canal 1 (encoderB1_count) para cálculo
-    rpm = (encoderB1_count / 11.0) * (600.0 / elapsedMillisB); // 8 pulsos por rotação (ajuste conforme necessário)
+    rpm = (encoderB1_count / 9.0) * (600.0 / elapsedMillisB) /1.97; // 8 pulsos por rotação (ajuste conforme necessário)
     
     // Resetar a contagem para o próximo cálculo
     encoderB1_count = 0;
@@ -82,7 +84,7 @@ float RPM(int motor) {
   return rpm;
 }
 
-float RPM_to_kmph(float rpm) {
+float RPM_to_kmh(float rpm) {
   // Calcular a circunferência da roda
   float wheelCircumference = PI * WHEEL_DIAMETER; // Circunferência em metros
 
@@ -93,7 +95,7 @@ float RPM_to_kmph(float rpm) {
 }
 
 // Função para converter a velocidade desejada em km/h para RPM
-float speedToRPM(float speedKmph) {
+float kmh_to_RPM(float speedKmph) {
   // Calcular a circunferência da roda
   float wheelCircumference = PI * WHEEL_DIAMETER; // Circunferência em metros
 
@@ -104,9 +106,9 @@ float speedToRPM(float speedKmph) {
 }
 
 // Função para converter RPM em um valor PWM
-int rpmToPWM(float rpm) {
+int rpm_To_PWM(float rpm) {
   // Definir a RPM máxima que corresponde ao valor máximo de PWM
-  float maxRPM = 1000; // Ajuste conforme necessário
+  float maxRPM = 100; // Ajuste conforme necessário
   int pwm = map(rpm, 0, maxRPM, 0, MAX_PWM);
   pwm = constrain(pwm, 0, MAX_PWM); // Garantir que o valor de PWM esteja dentro do intervalo
 
@@ -115,8 +117,8 @@ int rpmToPWM(float rpm) {
 
 // Função para definir a velocidade dos motores
 void setMotorSpeed(float desiredSpeedKmph) {
-  float rpm = speedToRPM(desiredSpeedKmph);
-  int pwm = rpmToPWM(rpm);
+  float rpm = kmh_to_RPM(desiredSpeedKmph);
+  int pwm = rpm_To_PWM(rpm);
 
   // Aplicar PWM aos motores
   analogWrite(ENA, pwm); // Ajuste para o Motor A
@@ -125,8 +127,8 @@ void setMotorSpeed(float desiredSpeedKmph) {
   // Definir a direção dos motores se necessário
   digitalWrite(IN1, HIGH); // Para frente
   digitalWrite(IN2, LOW);  // Para frente
-  digitalWrite(IN3, HIGH); // Para frente
-  digitalWrite(IN4, LOW);  // Para frente
+  digitalWrite(IN3, LOW); // Para frente
+  digitalWrite(IN4, HIGH);  // Para frente
 }
 
 void setMotorSpeed(float linearSpeed, float angularSpeed) {
@@ -136,8 +138,8 @@ void setMotorSpeed(float linearSpeed, float angularSpeed) {
   float V_outer = linearSpeed + (angularSpeed * radius);
 
   // Converter a velocidade linear das rodas para PWM
-  int pwm_inner = rpmToPWM(speedToRPM(V_inner * 3.6)); // Convertendo km/h para RPM
-  int pwm_outer = rpmToPWM(speedToRPM(V_outer * 3.6)); // Convertendo km/h para RPM
+  int pwm_inner = rpm_To_PWM(kmh_to_RPM(V_inner * 3.6)); // Convertendo km/h para RPM
+  int pwm_outer = rpm_To_PWM(kmh_to_RPM(V_outer * 3.6)); // Convertendo km/h para RPM
 
   // Aplicar PWM aos motores
   analogWrite(ENA, pwm_inner); // Ajuste para o Motor A (interna)
@@ -146,8 +148,8 @@ void setMotorSpeed(float linearSpeed, float angularSpeed) {
   // Definir a direção dos motores se necessário
   digitalWrite(IN1, HIGH); // Para frente
   digitalWrite(IN2, LOW);  // Para frente
-  digitalWrite(IN3, HIGH); // Para frente
-  digitalWrite(IN4, LOW);  // Para frente
+  digitalWrite(IN3, LOW); // Para frente
+  digitalWrite(IN4, HIGH);  // Para frente
 }
 
 void setup() {
@@ -203,7 +205,7 @@ void loop() {
   Serial.print("Distância: ");
   Serial.print(distance);
   Serial.println(" cm");
-
+/*
   // Imprimir contagem dos encoders do Motor 1
   Serial.print("Motor A - Canal 1: ");
   Serial.print(encoderA1_count);
@@ -215,33 +217,36 @@ void loop() {
   Serial.print(encoderB1_count);
   Serial.print(" | Canal 2: ");
   Serial.println(encoderB2_count);
-
+*/
   // Calcular e imprimir a RPM de cada motor
   Serial.print("RPM Motor A: ");
   Serial.println(RPM(1));
   Serial.print("RPM Motor B: ");
   Serial.println(RPM(2));
-
+/*
   // Imprimir a velocidade dos motores em km/h
   Serial.print("Velocidade Motor A: ");
-  Serial.print(RPM_to_kmph(rpmA));
+  Serial.print(RPM_to_kmh(RPM(1)));
   Serial.println(" km/h");
 
   Serial.print("Velocidade Motor B: ");
-  Serial.print(RPM_to_kmph(rpmB));
+  Serial.print(RPM_to_kmh(RPM(2)));
   Serial.println(" km/h");
-
+*/
   // Movimentar os motores se a distância for menor que 100 cm
-  if (distance > 30) {
+  if (distance > 10) {
+    
     // Mover motor A para frente
     digitalWrite(IN1, HIGH);
     digitalWrite(IN2, LOW);
-    analogWrite(ENA, 255); // velocidade do motor A
+    analogWrite(ENA, 100); // velocidade do motor A
     
+
     // Mover motor B para frente
-    digitalWrite(IN3, HIGH);
-    digitalWrite(IN4, LOW);
-    analogWrite(ENB, 255); // velocidade do motor B
+    digitalWrite(IN3, LOW);
+    digitalWrite(IN4, HIGH);
+    analogWrite(ENB, 100); // velocidade do motor B
+
   } else {
     // Parar os motores
     digitalWrite(IN1, LOW);
@@ -252,5 +257,5 @@ void loop() {
 
   //setMotorSpeed(1.0);
 
-  delay(100); // Pequeno atraso para estabilizar a leitura
+  delay(200); // Pequeno atraso para estabilizar a leitura
 }
