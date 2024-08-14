@@ -1,5 +1,8 @@
 <h1 align="center">Iniciacao-Cientifica</h1>
 <hr>
+
+![Badge em Desenvolvimento](http://img.shields.io/static/v1?label=STATUS&message=EM%20DESENVOLVIMENTO&color=GREEN&style=for-the-badge)
+
 ### Topicos
 
 - [Visao Computacional](#visao-computacional)
@@ -14,7 +17,9 @@ neste topico foram estudados e implementados formas de se analisar e categorizar
 ### resultados
   foi possivel utilizar webcam e captura de tela para fazer a identificação dos itens desejados e filtra-los, e tambem criar grid's para delimitação de area de ativação, fazendo assim com que seja possivel ativar funçoes expecificas apenas quando um objeto selecionado estiver na area escolhida
 
-  ![imagem de exemplo](https://github.com/LorenzoBertozzi/Iniciacao-Cientifica/blob/main/motion/capturas%20de%20tela/Captura%20de%20tela%202024-06-18%20105851.png)
+  <p align="center" height=200px>
+  <img loading="lazy" src="https://github.com/LorenzoBertozzi/Iniciacao-Cientifica/blob/main/motion/capturas%20de%20tela/Captura%20de%20tela%202024-06-18%20105851.png">
+  </p>
 
 ## Arduino
 neste topico desenvolvemos a parte de cirquito eletronico que controla-ra os motores e sensores fixos de nosso prototipo, utilizando um arduino uno, ponte-H L928N, 2 motores com encoders e caixa de redução 6v de 100RPM, 2 conjuntos de baterias e um sensor ultrasonico.
