@@ -119,18 +119,35 @@ int rpm_To_PWM(float rpm) {
 
 // Função para definir a velocidade dos motores
 void setMotorSpeed(float desiredSpeedKmph) {
-  float rpm = kmh_to_RPM(desiredSpeedKmph);
-  int pwm = rpm_To_PWM(rpm);
+  if(desiredSpeedKmph > 0){
+    float rpm = kmh_to_RPM(desiredSpeedKmph);
+    int pwm = rpm_To_PWM(rpm);
+    
+    // Aplicar PWM aos motores
+    analogWrite(ENA, pwm); // Ajuste para o Motor A
+    analogWrite(ENB, pwm); // Ajuste para o Motor B
 
-  // Aplicar PWM aos motores
-  analogWrite(ENA, pwm); // Ajuste para o Motor A
-  analogWrite(ENB, pwm); // Ajuste para o Motor B
+    // Definir a direção dos motores se necessário
+    digitalWrite(IN1, HIGH); // Para frente
+    digitalWrite(IN2, LOW);  // Para frente
+    digitalWrite(IN3, LOW); // Para frente
+    digitalWrite(IN4, HIGH);  // Para frente
+  }
+  else if(desiredSpeedKmph < 0){
+    float rpm = kmh_to_RPM(desiredSpeedKmph*(-1));
+    int pwm = rpm_To_PWM(rpm);
+    
+    // Aplicar PWM aos motores
+    analogWrite(ENA, pwm); // Ajuste para o Motor A
+    analogWrite(ENB, pwm); // Ajuste para o Motor B
 
-  // Definir a direção dos motores se necessário
-  digitalWrite(IN1, HIGH); // Para frente
-  digitalWrite(IN2, LOW);  // Para frente
-  digitalWrite(IN3, LOW); // Para frente
-  digitalWrite(IN4, HIGH);  // Para frente
+    // Definir a direção dos motores se necessário
+    digitalWrite(IN1, LOW); // Para frente
+    digitalWrite(IN2, HIGH);  // Para frente
+    digitalWrite(IN3, HIGH); // Para frente
+    digitalWrite(IN4, LOW);  // Para frente
+  }
+  
 }
 
 void setMotorSpeed(float linearSpeed, float angularSpeed) {
@@ -199,7 +216,14 @@ bool DesviarObstaculos() {
     distance = duration * 0.034 / 2;
 
     // Se a distância for menor que um limite, desvia
-    if (distance < 75) {
+    if(distance < 10){
+      setMotorSpeed(-1);
+
+      delay(1000);
+ 
+      return true;
+    }
+    else if (distance < 30) {
         // Parar os motores
         setMotorSpeed(0);
         
